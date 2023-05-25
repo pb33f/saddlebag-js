@@ -1,0 +1,7 @@
+src/
+.idea/
+vite.config.ts
+yarn.lock
+package-lock.json
+yarn-error.log
+tsconfig.json
