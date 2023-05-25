@@ -1,0 +1,22 @@
+{
+  "name": "@pb33f/saddlebag",
+  "version": "0.0.1",
+  "description": "A tiny, pure JavaScript in-memory object store library for simple application state management",
+  "main": "saddlebag.js",
+  "repository": "https://github.com/pb33f/saddlebag-js",
+  "author": "Princess Beef Heavy Industries LLC / Dave Shanley",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.1",
+    "@types/node": "^20.2.1",
+    "tslib": "^2.5.2",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vite-tsconfig-paths": "^4.2.0",
+    "rollup-plugin-typescript-paths": "^1.4.0"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  }
+}
