@@ -1,4 +1,6 @@
-import {CreateBag, Bag} from "./saddlebag";
+import {CreateBag} from "./saddlebag_engine.ts";
+import {Bag} from "./saddlebag.ts";
+
 
 export interface BagManager {
     CreateBag<T>(key: string): Bag<T> | undefined;
