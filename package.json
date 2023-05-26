@@ -1,37 +1,29 @@
 {
   "name": "@pb33f/saddlebag",
-  "version": "0.0.6",
+  "version": "0.0.7",
+  "license": "MIT",
   "private": false,
   "description": "A tiny, pure JavaScript in-memory object store library for simple application state management",
+  "type": "module",
+  "main": "./dist/saddlebag.umd.cjs",
+  "module": "./dist/saddlebag.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/saddlebag.js"
+      "import": "./dist/saddlebag.js",
+      "require": "./dist/saddlebag.umd.cjs"
     }
   },
-  "main": "./dist/saddlebag.js",
-  "module": "./dist/saddlebag.mjs",
-  "typings": "./dist/saddlebag.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pb33f/saddlebag-js.git"
-  },
-  "author": "Princess Beef Heavy Industries LLC / Dave Shanley",
-  "license": "MIT",
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.1",
-    "@types/node": "^20.2.1",
-    "tslib": "^2.5.2",
-    "typescript": "^5.0.4",
-    "vite": "^4.3.8",
-    "vite-tsconfig-paths": "^4.2.0",
-    "rollup-plugin-typescript-paths": "^1.4.0"
-  },
   "scripts": {
-    "start": "vite",
-    "build": "vite build"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
-  "bugs": {
-    "url": "https://github.com/pb33f/saddlebag-js/issues"
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.3.2"
   },
-  "homepage": "https://github.com/pb33f/saddlebag-js#readme"
+  "files": [
+    "dist"
+  ]
 }

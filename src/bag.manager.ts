@@ -1,8 +1,8 @@
 import {CreateBag, Bag} from "./saddlebag";
 
 export interface BagManager {
-    CreateBag<T>(key: string): Bag<T>;
-    GetBag<T>(key: string): Bag<T>;
+    CreateBag<T>(key: string): Bag<T> | undefined;
+    GetBag<T>(key: string): Bag<T> | undefined;
     ResetBags(): void;
 }
 
@@ -12,13 +12,14 @@ class saddlebagManager implements BagManager {
     constructor() {
         this._bags = new Map<string, Bag<any>>();
     }
+
     CreateBag<T>(key: string): Bag<T> {
         const store: Bag<T> = CreateBag<T>();
         this._bags.set(key, store);
         return store;
     }
 
-    GetBag<T>(key: string): Bag<T> {
+    GetBag<T>(key: string): Bag<T> | undefined {
         if (this._bags.has(key)) {
             return this._bags.get(key);
         }
@@ -32,14 +33,14 @@ class saddlebagManager implements BagManager {
     }
 }
 
-let _storeManagerSingleton: BagManager;
-export function CreateStoreManager(): BagManager {
-    if (!_storeManagerSingleton) {
-        _storeManagerSingleton = new saddlebagManager();
+let _bagManagerSingleton: BagManager;
+export function CreateBagManager(): BagManager {
+    if (!_bagManagerSingleton) {
+        _bagManagerSingleton = new saddlebagManager();
     }
-    return _storeManagerSingleton;
+    return _bagManagerSingleton;
 }
 
-export function GetStoreManager(): BagManager {
-   return CreateStoreManager();
+export function GetBagManager(): BagManager {
+   return CreateBagManager();
 }

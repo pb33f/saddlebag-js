@@ -1,20 +1,81 @@
-export type BagValueSubscriptionFunction<T> = (value: T) => void;
-export type BagAllChangeSubscriptionFunction<T> = (key: string, value: T) => void;
-export type BagPopulatedSubscriptionFunction<T> = (store: Map<string, T>) => void;
+export type BagValueSubscriptionFunction<T> = (value: T | undefined) => void;
+export type BagAllChangeSubscriptionFunction<T> = (key: string, value: T | undefined) => void;
+export type BagPopulatedSubscriptionFunction<T> = (store: Map<string, T>| undefined) => void;
 
-export interface Subscription {
-    unsubscribe(): void
+
+export class Subscription<T> {
+
+    private readonly _subscriptions: Map<string, BagValueSubscriptionFunction<T>[]>;
+    private  _allChangesSubscriptions: BagAllChangeSubscriptionFunction<T>[];
+    private readonly _allChangesBit: number;
+    private readonly _key: string;
+    private readonly _subFunction: BagValueSubscriptionFunction<T>;
+    private readonly _allChangesFunction: BagAllChangeSubscriptionFunction<T>;
+    private readonly _populatedFunction: BagPopulatedSubscriptionFunction<T>;
+    private _storePopulatedSubscriptions: BagPopulatedSubscriptionFunction<T>[];
+
+    constructor(subs: Map<string, BagValueSubscriptionFunction<T>[]>,
+                allChangesSubs: BagAllChangeSubscriptionFunction<T>[],
+                storePopulatedSubscriptions: BagPopulatedSubscriptionFunction<T>[],
+                subFunction: BagValueSubscriptionFunction<T>,
+                allChangesFunction: BagAllChangeSubscriptionFunction<T>,
+                populatedFunction: BagPopulatedSubscriptionFunction<T>,
+                key: string,
+                allChangesBit: number) {
+        this._subscriptions = subs;
+        this._allChangesSubscriptions = allChangesSubs;
+        this._allChangesBit = allChangesBit;
+        this._key = key
+        this._subFunction = subFunction;
+        this._allChangesFunction = allChangesFunction;
+        this._storePopulatedSubscriptions = storePopulatedSubscriptions;
+        this._populatedFunction = populatedFunction;
+    }
+    unsubscribe(): void {
+
+        switch (this._allChangesBit) {
+            case 0:
+                const located = this._subscriptions.get(this._key)
+                if (located) {
+                    this._subscriptions.set(this._key,
+                        located.filter((cb) => cb !== this._subFunction));
+                }
+                break;
+            case 1:
+                this._allChangesSubscriptions =
+                    this._allChangesSubscriptions.filter((cb) => cb !== this._allChangesFunction);
+                break;
+            case 2:
+                this._storePopulatedSubscriptions =
+                    this._storePopulatedSubscriptions.filter((cb) => cb !== this._populatedFunction);
+
+
+        }
+
+        if (this._allChangesBit == 0)  {
+
+
+        } else {
+
+
+        }
+    }
 }
+
+
 export interface Bag<T> {
     set(key: string, value: T): void;
-    get(key: string): T;
+    get(key: string): T | undefined;
     populate(data: Map<string, T>): void
     export(): Map<string, T>
-    subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription;
-    onAllChanges(callback: BagAllChangeSubscriptionFunction<T>): Subscription;
-    onPopulated(callback: BagPopulatedSubscriptionFunction<T>): Subscription;
+    subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription<T>;
+    onAllChanges(callback: BagAllChangeSubscriptionFunction<T>): Subscription<T>;
+    onPopulated(callback: BagPopulatedSubscriptionFunction<T>): Subscription<T>;
     reset(): void;
 }
+
+
+
 
 export function CreateBag<T>(): Bag<T> {
     return new bag<T>();
@@ -22,9 +83,9 @@ export function CreateBag<T>(): Bag<T> {
 
 class bag<T> {
     private _values: Map<string, T>;
-    private _subscriptions: Map<string, BagValueSubscriptionFunction<T>[]>;
-    private _allChangesSubscriptions: BagAllChangeSubscriptionFunction<T>[];
-    private _storePopulatedSubscriptions: BagPopulatedSubscriptionFunction<T>[];
+    private readonly _subscriptions: Map<string, BagValueSubscriptionFunction<T>[]>;
+    private readonly _allChangesSubscriptions: BagAllChangeSubscriptionFunction<T>[];
+    private readonly _storePopulatedSubscriptions: BagPopulatedSubscriptionFunction<T>[];
 
     constructor() {
         this._values = new Map<string, T>();
@@ -39,15 +100,16 @@ class bag<T> {
     }
 
     reset(): void {
+        // @ts-ignore
         this._values.forEach((value: T, key: string) => {
-            this.alertSubscribers(key, null); // the value is gone!
+            this.alertSubscribers(key, undefined); // the value is gone!
         });
         this._values = new Map<string, T>();
     }
 
-    private alertSubscribers(key: string, value: T): void {
+    private alertSubscribers(key: string, value: T | undefined): void {
         if (this._subscriptions.has(key)) {
-            this._subscriptions.get(key).forEach(
+            this._subscriptions.get(key)?.forEach(
                 (callback: BagValueSubscriptionFunction<T>) => callback(value));
         }
         if(this._allChangesSubscriptions.length > 0) {
@@ -56,7 +118,7 @@ class bag<T> {
         }
     }
 
-    get(key: string): T {
+    get(key: string): T | undefined {
         return this._values.get(key);
     }
 
@@ -74,39 +136,77 @@ class bag<T> {
         return this._values
     }
     
-    subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription {
+    subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription<T> {
         if (!this._subscriptions.has(key)) {
             this._subscriptions.set(key, [callback]);
         } else {
-            const existingSubscriptions: BagValueSubscriptionFunction<T>[] = this._subscriptions.get(key);
-            this._subscriptions.set(key, [...existingSubscriptions, callback]);
-        }
-        return {
-            unsubscribe() {
-                this._subscriptions.set(key,
-                    this._subscriptions.get(key).filter((cb) => cb !== callback));
+            const existingSubscriptions = this._subscriptions.get(key);
+            if (existingSubscriptions) {
+                this._subscriptions.set(key, [...existingSubscriptions, callback]);
             }
-        };
+        }
+
+        return new Subscription(
+            this._subscriptions,
+            this._allChangesSubscriptions,
+            this._storePopulatedSubscriptions,
+            callback,
+            ()=>{},
+            ()=>{},
+            key,
+            0);
+
+
+
+        // return {
+        //
+        //
+        //     unsubscribe() {
+        //         this._subscriptions.set(key,
+        //             this._subscriptions.get(key).filter((cb) => cb !== callback));
+        //     }
+        // };
     }
 
-    onAllChanges(callback: BagAllChangeSubscriptionFunction<T>): Subscription {
+    onAllChanges(callback: BagAllChangeSubscriptionFunction<T>): Subscription<T> {
         this._allChangesSubscriptions.push(callback);
-        return {
-            unsubscribe() {
-                this._allChangesSubscriptions =
-                    this._allChangesSubscriptions.filter((cb) => cb !== callback);
-            }
-        }
+
+
+        return new Subscription(
+            this._subscriptions,
+            this._allChangesSubscriptions,
+            this._storePopulatedSubscriptions,
+            ()=>{},
+            callback,
+            ()=>{},
+            '',
+            1);
+
+
+
+        //return new Subscription(this._subscriptions,this._allChangesSubscriptions,true,"",()=>{},callback);
+
+        // return {
+        //     unsubscribe() {
+        //         this._allChangesSubscriptions =
+        //             this._allChangesSubscriptions.filter((cb) => cb !== callback);
+        //     }
+        // }
     }
 
-    onPopulated(callback: BagPopulatedSubscriptionFunction<T>): Subscription {
+    onPopulated(callback: BagPopulatedSubscriptionFunction<T>): Subscription<T> {
         this._storePopulatedSubscriptions.push(callback);
-        return {
-            unsubscribe() {
-                this._storePopulatedSubscriptions =
-                    this._storePopulatedSubscriptions.filter((cb) => cb !== callback);
-            }
-        }
+
+        return new Subscription(
+            this._subscriptions,
+            this._allChangesSubscriptions,
+            this._storePopulatedSubscriptions,
+            ()=>{},
+            ()=>{},
+            callback,
+            '',
+            2);
+
     }
 
 }
