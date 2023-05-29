@@ -30,7 +30,7 @@ jobs:
       - name: Install yarn
         run: yarn install
 
-      - name: Build
+      - name: Build application
         run: yarn build
 
       - name: Setup Git user
