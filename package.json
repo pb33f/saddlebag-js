@@ -1,6 +1,6 @@
 {
   "name": "@pb33f/saddlebag",
-  "version": "0.0.7 ",
+  "version": "0.0.0",
   "license": "MIT",
   "private": false,
   "description": "A tiny, pure JavaScript in-memory object store library for simple application state management",
