@@ -3,9 +3,9 @@ import {Bag} from "./saddlebag.ts";
 
 
 export interface BagManager {
-    CreateBag<T>(key: string): Bag<T> | undefined;
-    GetBag<T>(key: string): Bag<T> | undefined;
-    ResetBags(): void;
+    createBag<T>(key: string): Bag<T> | undefined;
+    getBag<T>(key: string): Bag<T> | undefined;
+    resetBags(): void;
 }
 
 class saddlebagManager implements BagManager {
@@ -15,20 +15,20 @@ class saddlebagManager implements BagManager {
         this._bags = new Map<string, Bag<any>>();
     }
 
-    CreateBag<T>(key: string): Bag<T> {
+    createBag<T>(key: string): Bag<T> {
         const store: Bag<T> = CreateBag<T>();
         this._bags.set(key, store);
         return store;
     }
 
-    GetBag<T>(key: string): Bag<T> | undefined {
+    getBag<T>(key: string): Bag<T> | undefined {
         if (this._bags.has(key)) {
             return this._bags.get(key);
         }
         return CreateBag<T>();
     }
 
-    ResetBags() {
+    resetBags() {
         this._bags.forEach((store: Bag<any>) => {
             store.reset();
         });

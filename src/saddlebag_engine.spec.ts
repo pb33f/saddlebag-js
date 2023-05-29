@@ -17,7 +17,7 @@ describe('store basics', () => {
 
         let counter = 0;
 
-        const sub1 = bag.subscribe('foo', () => {
+        const sub1 = bag.subscribe('foo', (value: string) => {
             counter++;
         })
 

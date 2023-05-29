@@ -1,12 +1,12 @@
-export type BagValueSubscriptionFunction<T> = (value: T | undefined) => void;
-export type BagAllChangeSubscriptionFunction<T> = (key: string, value: T | undefined) => void;
-export type BagPopulatedSubscriptionFunction<T> = (store: Map<string, T> | undefined) => void;
+export type BagValueSubscriptionFunction<T = any> = (value: T | undefined) => void;
+export type BagAllChangeSubscriptionFunction<T = any> = (key: string, value: T | undefined) => void;
+export type BagPopulatedSubscriptionFunction<T = any> = (store: Map<string, T> | undefined) => void;
 
 export interface Subscription {
     unsubscribe(): void
 }
 
-export interface Bag<T> {
+export interface Bag<T = any> {
     set(key: string, value: T): void;
 
     get(key: string): T | undefined;
