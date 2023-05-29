@@ -27,6 +27,12 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
 
+      - name: Install yarn
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
       - name: Setup Git user
         run: |
           git config --global user.name "Github Bot"
