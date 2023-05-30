@@ -106,4 +106,32 @@ describe('store basics', () => {
         expect(counter).toEqual(2);
 
     });
+
+    it('check a get value cannot be mutated', () => {
+        const bag = CreateBag();
+        const bar = { sleepy: 'time' };
+
+        bag.set('k', bar);
+        expect(bag.get('k')).toEqual(bar);
+
+        bar.sleepy = 'now';
+        expect(bag.get('k')).not.toEqual(bar)
+    });
+
+
+    it('check population cannot be mutated after storing', () => {
+        const bag = CreateBag();
+        const bar = { sleepy: 'time' };
+
+
+        const data = new Map<string,any>([['k',bar]]);
+
+        bag.populate(data)
+        expect(bag.get('k')).toEqual(bar);
+
+        bar.sleepy = 'now';
+        expect(bag.get('k')).not.toEqual(bar)
+    });
+
+
 })

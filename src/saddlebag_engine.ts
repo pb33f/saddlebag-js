@@ -78,7 +78,7 @@ class bag<T> {
     }
 
     set(key: string, value: T): void {
-        this._values.set(key, value);
+        this._values.set(key, structuredClone(value));
         this.alertSubscribers(key, value)
     }
 
@@ -107,7 +107,7 @@ class bag<T> {
 
     populate(data: Map<string, T>): void {
         if (data && data.size > 0) {
-            this._values = data;
+            this._values = structuredClone(data);
             if (this._storePopulatedSubscriptions.length > 0) {
                 this._storePopulatedSubscriptions.forEach(
                     (callback: BagPopulatedSubscriptionFunction<T>) => callback(data));
@@ -116,7 +116,7 @@ class bag<T> {
     }
 
     export(): Map<string, T> {
-        return this._values
+        return this._values;
     }
 
     subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription {
