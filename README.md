@@ -5,6 +5,8 @@ state in any JavaScript Application running anywhere.
 
 It is less than 1kb when gzipped and 3kb when minified.
 
+It's called '_saddlebag_' because every cowboy needs a reliable and simple place to store their stuff.
+
 `saddlebag` is built in TypeScript and has full type support.
 
 ---
