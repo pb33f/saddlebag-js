@@ -81,5 +81,15 @@ export interface Bag<T = any> {
      * and popular.
      */
     reset(): void;
+
+    /**
+     * id is the unique identifier of the bag.
+     */
+    get id(): string;
+
+    /**
+     * db is the IndexedID database that the bag is associated with.
+     */
+    set db(db: IDBDatabase | undefined);
 }
 
