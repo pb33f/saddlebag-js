@@ -4,9 +4,10 @@ import {
     BagPopulatedSubscriptionFunction,
     BagValueSubscriptionFunction, Subscription
 } from "./saddlebag.ts";
+import {BAG_OBJECT_STORE} from "./bag.manager.ts";
 
-export function CreateBag<T>(): Bag<T> {
-    return new bag<T>();
+export function CreateBag<T>(id: string, stateful?: boolean): Bag<T> {
+    return new bag<T>(id, stateful);
 }
 
 export class BagSubscription<T> {
@@ -65,21 +66,42 @@ export class BagSubscription<T> {
 }
 
 class bag<T> {
+    private _id: string;
+    private _stateful: boolean;
     private _values: Map<string, T>;
+    private _db: IDBDatabase | undefined;
+    private _bagStore: IDBObjectStore | undefined;
+
     _subscriptions: Map<string, BagValueSubscriptionFunction<T>[]>;
     _allChangesSubscriptions: BagAllChangeSubscriptionFunction<T>[];
     _storePopulatedSubscriptions: BagPopulatedSubscriptionFunction<T>[];
 
-    constructor() {
+    constructor(id: string, stateful?: boolean) {
         this._values = new Map<string, T>();
         this._subscriptions = new Map<string, BagValueSubscriptionFunction<T>[]>()
         this._allChangesSubscriptions = [];
         this._storePopulatedSubscriptions = [];
+        this._stateful = stateful || false;
+        this._id = id;
     }
 
     set(key: string, value: T): void {
         this._values.set(key, structuredClone(value));
         this.alertSubscribers(key, value)
+
+        if (this._stateful && this._db) {
+            this._db.transaction([BAG_OBJECT_STORE], 'readwrite')
+                .objectStore(BAG_OBJECT_STORE)
+                .put(this._values, this._id);
+        }
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    set db(db: IDBDatabase | undefined) {
+        this._db = db;
     }
 
     reset(): void {

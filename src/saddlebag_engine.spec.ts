@@ -1,10 +1,61 @@
 import {describe, expect, it } from 'vitest'
 import {CreateBag} from "./saddlebag_engine";
+import {BAG_OBJECT_STORE, CreateBagManager} from "./bag.manager";
+
+import indexeddb from 'fake-indexeddb';
+
+// @ts-ignore
+globalThis.indexedDB = indexeddb;
 
 describe('store basics', () => {
 
+    it('create a new stateful bag and add an item to it, then check its still there', async (): Promise<void> => {
+
+        const bm = CreateBagManager(true)
+        expect(bm).toBeDefined();
+        expect(bm.db).toBeNull();
+
+        const p = new Promise<void>((resolve) => {
+
+            bm.loadStatefulBags().then(() => {
+
+                expect(bm.db).toBeDefined();
+
+                const bag = bm.createBag<string>('foo');
+                if (bag) {
+                    expect(bag.id).toEqual('foo');
+                    expect(bag.get('foo')).toBeUndefined();
+                    bag.set('foo', 'bar');
+                    expect(bag.get('foo')).toEqual('bar');
+                }
+
+                bm.db.transaction([BAG_OBJECT_STORE])
+                    .objectStore(BAG_OBJECT_STORE).get('foo').onsuccess = (event: any) => {
+
+                    const result = event.target.result;
+                    expect(result).toBeDefined();
+                    expect(result.get('foo')).toEqual('bar');
+
+                    // create a new bag manager and then try again, should be the same result
+                    const bm2 = CreateBagManager(true)
+                    expect(bm2).toBeDefined();
+
+                    bm2.loadStatefulBags().then(() => {
+                        const bag2 = bm2.getBag<string>('foo');
+                        if (bag2) {
+                            expect(bag2.get('foo')).toEqual('bar');
+                            resolve(result)
+                        }
+                    })
+                }
+            })
+        })
+        return p
+    }, 500)
+
+
     it('create a new bag and add an item to it', () => {
-        const bag = CreateBag<string>();
+        const bag = CreateBag<string>('boo');
         expect(bag).toBeDefined();
         expect(bag).not.toBeNull();
         expect(bag.get('foo')).toBeUndefined();
@@ -13,10 +64,11 @@ describe('store basics', () => {
     })
 
     it('subscribe and unsubscribe to a store', () => {
-        const bag = CreateBag<string>();
+        const bag = CreateBag<string>('foo');
 
         let counter = 0;
 
+        // @ts-ignore
         const sub1 = bag.subscribe('foo', (value: string) => {
             counter++;
         })
@@ -41,7 +93,7 @@ describe('store basics', () => {
     });
 
     it('subscribe and unsubscribe to a store for all changes', () => {
-        const bag = CreateBag<string>();
+        const bag = CreateBag<string>('foo');
 
         let counter = 0;
 
@@ -64,7 +116,7 @@ describe('store basics', () => {
     });
 
     it('subscribe and unsubscribe to a store on population', () => {
-        const bag = CreateBag<string>();
+        const bag = CreateBag<string>('foo');
 
         let counter = 0;
 
@@ -92,7 +144,7 @@ describe('store basics', () => {
     });
 
     it('reset a bag', () => {
-        const bag = CreateBag<string>();
+        const bag = CreateBag<string>('foo');
 
         let counter = 0;
 
@@ -108,7 +160,7 @@ describe('store basics', () => {
     });
 
     it('check a get value cannot be mutated', () => {
-        const bag = CreateBag();
+        const bag = CreateBag('foo');
         const bar = { sleepy: 'time' };
 
         bag.set('k', bar);
@@ -120,7 +172,7 @@ describe('store basics', () => {
 
 
     it('check population cannot be mutated after storing', () => {
-        const bag = CreateBag();
+        const bag = CreateBag('foo');
         const bar = { sleepy: 'time' };
 
 
