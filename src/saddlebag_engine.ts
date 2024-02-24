@@ -70,7 +70,6 @@ class bag<T> {
     private _stateful: boolean;
     private _values: Map<string, T>;
     private _db: IDBDatabase | undefined;
-    private _bagStore: IDBObjectStore | undefined;
 
     _subscriptions: Map<string, BagValueSubscriptionFunction<T>[]>;
     _allChangesSubscriptions: BagAllChangeSubscriptionFunction<T>[];
@@ -110,6 +109,12 @@ class bag<T> {
             this.alertSubscribers(key, undefined); // the value is gone!
         });
         this._values = new Map<string, T>();
+        // if there is a db, wipe out the bag in the db
+        if (this._stateful && this._db) {
+            this._db.transaction([BAG_OBJECT_STORE], 'readwrite')
+                .objectStore(BAG_OBJECT_STORE)
+                .delete(this._id);
+        }
     }
 
     private alertSubscribers(key: string, value: T | undefined): void {

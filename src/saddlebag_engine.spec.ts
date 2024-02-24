@@ -44,7 +44,20 @@ describe('store basics', () => {
                         const bag2 = bm2.getBag<string>('foo');
                         if (bag2) {
                             expect(bag2.get('foo')).toEqual('bar');
-                            resolve(result)
+
+
+                            // now reset the bag and check its gone from the db
+                            bag2.reset();
+                            const bm3 = CreateBagManager(true)
+                            expect(bm3).toBeDefined();
+
+                            bm3.loadStatefulBags().then(() => {
+
+                                // should be gone.
+                                expect(bag2.get('foo')).toBeUndefined()
+                                resolve(result)
+
+                            });
                         }
                     })
                 }
