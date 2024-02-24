@@ -58,17 +58,13 @@ class saddlebagManager implements BagManager {
     }
 
     loadStatefulBags(): Promise<BagDB> {
-        return new Promise<BagDB>((resolve, reject) => {
+        return new Promise<BagDB>((resolve) => {
             const request = indexedDB.open(BAG_DB_NAME, 1);
             request.onupgradeneeded = () => {
                 // @ts-ignore
                 this._db = request.result
                 this._db.createObjectStore(BAG_OBJECT_STORE);
             };
-
-            request.onerror = (event) => {
-                reject(event);
-            }
 
             request.onsuccess = () => {
                 // @ts-ignore
@@ -77,10 +73,6 @@ class saddlebagManager implements BagManager {
                 if (this._db) {
                     const tx =  this._db.transaction(BAG_OBJECT_STORE)
                     const cursor = tx.objectStore(BAG_OBJECT_STORE).openCursor()
-
-                    cursor.onerror = (event) => {
-                        reject(event);
-                    }
 
                     cursor.onsuccess = (event) => {
                         // @ts-ignore
@@ -119,7 +111,7 @@ class saddlebagManager implements BagManager {
         if (this._bags.has(key)) {
             return this._bags.get(key);
         }
-        return CreateBag<T>(key, );
+        return this.createBag(key)
     }
 
     resetBags() {

@@ -58,6 +58,7 @@ export interface Bag<T = any> {
      * key is changed, the callback will be called with the new value.
      * @param {string} key to be monitored
      * @param {BagValueSubscriptionFunction<T>} callback to fire on every change, updated value will be passed
+     * @return {Subscription} a handle to the subscription
      */
     subscribe(key: string, callback: BagValueSubscriptionFunction<T>): Subscription;
 
@@ -65,6 +66,7 @@ export interface Bag<T = any> {
      * onAllChanges will add a subscription to the bag for all changes. Any time that
      * any value changes in the bag, subscribers will be notified.
      * @param {BagAllChangeSubscriptionFunction<T>} callback to fire on every change
+     * @return {Subscription} a handle to the subscription
      */
     onAllChanges(callback: BagAllChangeSubscriptionFunction<T>): Subscription;
 
@@ -72,6 +74,7 @@ export interface Bag<T = any> {
      * onPopulated will add a subscription to the bag for when the bag is populated with
      * any data. The entire contents of the bag will be passed to the callback.
      * @param {BagPopulatedSubscriptionFunction<T>} callback
+     * @return {Subscription} a handle to the subscription
      */
     onPopulated(callback: BagPopulatedSubscriptionFunction<T>): Subscription;
 
@@ -84,11 +87,13 @@ export interface Bag<T = any> {
 
     /**
      * id is the unique identifier of the bag.
+     * @return {string} the unique identifier of the bag
      */
     get id(): string;
 
     /**
      * db is the IndexedID database that the bag is associated with.
+     * @param db {IDBDatabase | undefined} indexedDB used to store the bag.
      */
     set db(db: IDBDatabase | undefined);
 }
