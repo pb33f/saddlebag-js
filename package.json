@@ -5,18 +5,11 @@
   "private": false,
   "description": "A tiny, pure JavaScript in-memory object store library for simple application state management",
   "type": "module",
-  "main": "./dist/saddlebag.umd.cjs",
-  "module": "./dist/saddlebag.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/saddlebag.js",
-      "require": "./dist/saddlebag.umd.cjs"
-    }
-  },
+  "main": "./dist/saddlebag.js",
+  "types": "./dist/main.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage"
@@ -25,11 +18,12 @@
     "@vitest/coverage-c8": "^0.31.1",
     "@vitest/ui": "^0.31.1",
     "c8": "^7.13.0",
+    "fake-indexeddb": "^5.0.2",
     "i": "^0.3.7",
     "typescript": "^5.0.2",
-    "vite": "^4.3.2",
+    "vite": "^5.2.8",
     "vitest": "^0.31.1",
-    "fake-indexeddb": "^5.0.2"
+    "vite-plugin-dts": "^3.8.1"
   },
   "files": [
     "dist"

@@ -1,5 +1,5 @@
-import {CreateBag} from "./saddlebag_engine.ts";
-import {Bag} from "./saddlebag.ts";
+import {CreateBag} from "./saddlebag_engine.js";
+import {Bag} from "./saddlebag.js";
 
 
 export const BAG_OBJECT_STORE = 'bags';
@@ -43,7 +43,7 @@ export interface BagManager {
 
 }
 
-interface BagDB  {
+export interface BagDB  {
     db: IDBDatabase | undefined;
 }
 
