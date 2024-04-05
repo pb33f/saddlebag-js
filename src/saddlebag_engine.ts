@@ -3,8 +3,8 @@ import {
     BagAllChangeSubscriptionFunction,
     BagPopulatedSubscriptionFunction,
     BagValueSubscriptionFunction, Subscription
-} from "./saddlebag.ts";
-import {BAG_OBJECT_STORE} from "./bag.manager.ts";
+} from "./saddlebag.js";
+import {BAG_OBJECT_STORE} from "./bag.manager.js";
 
 export function CreateBag<T>(id: string, stateful?: boolean): Bag<T> {
     return new bag<T>(id, stateful);
