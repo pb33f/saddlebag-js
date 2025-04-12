@@ -101,6 +101,10 @@ class saddlebagManager implements BagManager {
     }
 
     createBag<T>(key: string): Bag<T> {
+        if (this._bags.has(key)) {
+          return this._bags.get(key)!;
+        }
+
         const bag: Bag<T> = CreateBag<T>(key, this._stateful);
         bag.db = this._db;
         this._bags.set(key, bag);

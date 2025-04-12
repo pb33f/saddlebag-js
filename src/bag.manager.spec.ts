@@ -3,6 +3,38 @@ import {CreateBagManager, GetBagManager} from "./bag.manager";
 import {Bag} from "./saddlebag";
 
 describe('bag manager basics', () => {
+    it('should create multiple instances of the same bag', () => {
+      const bagKey = 'bag-key';
+
+      const changeKey = 'changed-key';
+
+      let allChangesCounter = 0;
+      let subscriptionCounter = 0;
+
+      const createInstance = () => {
+        let bm = CreateBagManager(true);
+        let bag = bm.createBag(bagKey)!;
+
+        bag.onAllChanges(() => {
+          allChangesCounter++;
+        });
+
+        bag.subscribe(changeKey, () => {
+          subscriptionCounter++;
+        });
+      };
+
+      createInstance();
+      createInstance();
+      createInstance();
+
+      let bm = CreateBagManager(true);
+      let bag = bm.createBag(bagKey)!;
+      bag.set(changeKey, 'ok');
+
+      expect(allChangesCounter).toEqual(3);
+      expect(subscriptionCounter).toEqual(3);
+    });
 
     it('create a new bag manager and a bag', () => {
 
@@ -13,6 +45,8 @@ describe('bag manager basics', () => {
         expect(bag.get('foo')).toBeUndefined();
         bag.set('foo', 'bar');
         expect(bag.get('foo')).toEqual('bar');
+
+        bag?.reset()
     })
 
     it('ensure two bad managers always have the same bag', () => {
