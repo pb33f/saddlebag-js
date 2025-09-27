@@ -29,37 +29,39 @@ describe('store basics', () => {
                     expect(bag.get('foo')).toEqual('bar');
                 }
 
-                bm.db.transaction([BAG_OBJECT_STORE])
-                    .objectStore(BAG_OBJECT_STORE).get('foo').onsuccess = (event: any) => {
+                if (bm && bm.db) {
+                    bm.db.transaction([BAG_OBJECT_STORE])
+                        .objectStore(BAG_OBJECT_STORE).get('foo').onsuccess = (event: any) => {
 
-                    const result = event.target.result;
-                    expect(result).toBeDefined();
-                    expect(result.get('foo')).toEqual('bar');
+                        const result = event.target.result;
+                        expect(result).toBeDefined();
+                        expect(result.get('foo')).toEqual('bar');
 
-                    // create a new bag manager and then try again, should be the same result
-                    const bm2 = CreateBagManager(true)
-                    expect(bm2).toBeDefined();
+                        // create a new bag manager and then try again, should be the same result
+                        const bm2 = CreateBagManager(true)
+                        expect(bm2).toBeDefined();
 
-                    bm2.loadStatefulBags().then(() => {
-                        const bag2 = bm2.getBag<string>('foo');
-                        if (bag2) {
-                            expect(bag2.get('foo')).toEqual('bar');
+                        bm2.loadStatefulBags().then(() => {
+                            const bag2 = bm2.getBag<string>('foo');
+                            if (bag2) {
+                                expect(bag2.get('foo')).toEqual('bar');
 
 
-                            // now reset the bag and check its gone from the db
-                            bag2.reset();
-                            const bm3 = CreateBagManager(true)
-                            expect(bm3).toBeDefined();
+                                // now reset the bag and check its gone from the db
+                                bag2.reset();
+                                const bm3 = CreateBagManager(true)
+                                expect(bm3).toBeDefined();
 
-                            bm3.loadStatefulBags().then(() => {
+                                bm3.loadStatefulBags().then(() => {
 
-                                // should be gone.
-                                expect(bag2.get('foo')).toBeUndefined()
-                                resolve(result)
+                                    // should be gone.
+                                    expect(bag2.get('foo')).toBeUndefined()
+                                    resolve(result)
 
-                            });
-                        }
-                    })
+                                });
+                            }
+                        })
+                    }
                 }
             })
         })

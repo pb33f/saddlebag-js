@@ -21,8 +21,8 @@
     "fake-indexeddb": "^5.0.2",
     "i": "^0.3.7",
     "typescript": "^5.0.2",
-    "vite": "^5.2.8",
-    "vitest": "^0.31.1",
+    "vite": "7.1.7",
+    "vitest": "^3.2.4",
     "vite-plugin-dts": "^3.8.1"
   },
   "files": [
