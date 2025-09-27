@@ -68,6 +68,20 @@ using the `resetBags()` method.
 
 ---
 
+## Stateful bags
+
+When creating a `bag manager`, you can make it `stateful` by passing `true` to `CreateBagManager(true)`. All
+bags created will then be 'fused' with a entry in `IndexedDB` in the browser.
+
+A new tabled named `saddlebag` will be added, combined with a table called `bags`
+
+Each write via `set` on a bag, will also write to the DB, and when you reload your browser, `saddlebag` can 
+restore state to each bag automatically using the `loadStatefulBags()` method on your `bag manager`. 
+
+A Promise is returned that resolves once all state is loaded and ready and your bags are loaded and ready hit the trail.
+
+---
+
 ## Basic Use
 
 All imports are exposed as named exports via `@pb33f/saddlebag`.
@@ -169,5 +183,25 @@ const bag = bagManager.getBag<string>('foo');
 ```
 
 ---
+
+## Loading stateful bags
+
+If the `bag manager` was created as a stateful one, then use the `loadStatefulBags()` to populate from IndexedDB.
+
+```typescript
+bagManager.loadStatefulBags().then(() => {
+    // do something fun.
+    ...
+});
+```
+
+A promise is returned that resolves once all data is populated in all bags. 
+
+The values for the DB/Store name in IndexedDB
+
+```typescript
+export const BAG_OBJECT_STORE = 'bags';
+export const BAG_DB_NAME = 'saddlebag';
+```
 
 `saddlebag` A product of [pb33f](https://pb33f.io).
