@@ -87,16 +87,23 @@ class bag<T> {
     set(key: string, value: T): void {
         this._values.set(key, structuredClone(value));
         this.alertSubscribers(key, value)
-
         if (this._stateful && this._db) {
             this._db.transaction([BAG_OBJECT_STORE], 'readwrite')
                 .objectStore(BAG_OBJECT_STORE)
                 .put(this._values, this._id);
+
+        }
+        if (this._stateful && !this._db) {
+            console.error("db not available, cannot write to db for key:", key);
         }
     }
 
     get id(): string {
         return this._id;
+    }
+
+    get db(): IDBDatabase | undefined {
+        return this._db;
     }
 
     set db(db: IDBDatabase | undefined) {

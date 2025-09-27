@@ -1,6 +1,5 @@
 import {describe, expect, it} from 'vitest'
 import {CreateBagManager, GetBagManager} from "./bag.manager";
-import {Bag} from "./saddlebag";
 
 describe('bag manager basics', () => {
     it('should create multiple instances of the same bag', () => {
@@ -42,11 +41,17 @@ describe('bag manager basics', () => {
         const bag = bagManager.createBag<string>('foo');
         expect(bag).toBeDefined();
         expect(bag).not.toBeNull();
+<<<<<<< Updated upstream
         expect(bag.get('foo')).toBeUndefined();
         bag.set('foo', 'bar');
         expect(bag.get('foo')).toEqual('bar');
 
         bag?.reset()
+=======
+        expect(bag?.get('foo')).toBeUndefined();
+        bag?.set('foo', 'bar');
+        expect(bag?.get('foo')).toEqual('bar');
+>>>>>>> Stashed changes
     })
 
     it('ensure two bad managers always have the same bag', () => {
@@ -55,10 +60,10 @@ describe('bag manager basics', () => {
         const bagManager2 = CreateBagManager();
         const bagManager3 = GetBagManager();
 
-        const bag: Bag<string> = bagManager1.createBag<string>('foo');
+        const bag = bagManager1.createBag<string>('foo');
         expect(bag).toBeDefined();
         expect(bag).not.toBeNull();
-        expect(bag.get('foo')).toBeUndefined();
+        expect(bag?.get('foo')).toBeUndefined();
 
         const sameBag = bagManager2.getBag<string>('foo');
         expect(bag).toEqual(sameBag);
@@ -72,8 +77,8 @@ describe('bag manager basics', () => {
 
         const bagManager = CreateBagManager();
         const bag = bagManager.createBag<string>('foo');
-        bag.set("foo", "bar");
-        expect(bag.get("foo")).toEqual("bar");
+        bag?.set("foo", "bar");
+        expect(bag?.get("foo")).toEqual("bar");
         expect(bagManager.getBag<string>('shoes')).toBeDefined();
 
     })
@@ -83,10 +88,10 @@ describe('bag manager basics', () => {
 
         const bagManager = CreateBagManager();
         const bag = bagManager.createBag<string>('foo');
-        bag.set("foo", "bar");
-        expect(bag.get("foo")).toEqual("bar");
+        bag?.set("foo", "bar");
+        expect(bag?.get("foo")).toEqual("bar");
         bagManager.resetBags();
-        expect(bag.get("foo")).toBeUndefined();
+        expect(bag?.get("foo")).toBeUndefined();
 
     })
 

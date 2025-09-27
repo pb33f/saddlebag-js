@@ -96,5 +96,10 @@ export interface Bag<T = any> {
      * @param db {IDBDatabase | undefined} indexedDB used to store the bag.
      */
     set db(db: IDBDatabase | undefined);
+
+    /**
+     * db is the IndexedID database that the bag is associated with.
+     */
+    get db(): IDBDatabase | undefined;
 }
 
