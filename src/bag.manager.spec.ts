@@ -11,7 +11,7 @@ describe('bag manager basics', () => {
       let subscriptionCounter = 0;
 
       const createInstance = () => {
-        let bm = CreateBagManager(true);
+        let bm = CreateBagManager(false);
         let bag = bm.createBag(bagKey)!;
 
         bag.onAllChanges(() => {
@@ -27,7 +27,7 @@ describe('bag manager basics', () => {
       createInstance();
       createInstance();
 
-      let bm = CreateBagManager(true);
+      let bm = CreateBagManager(false);
       let bag = bm.createBag(bagKey)!;
       bag.set(changeKey, 'ok');
 
@@ -41,17 +41,11 @@ describe('bag manager basics', () => {
         const bag = bagManager.createBag<string>('foo');
         expect(bag).toBeDefined();
         expect(bag).not.toBeNull();
-<<<<<<< Updated upstream
-        expect(bag.get('foo')).toBeUndefined();
-        bag.set('foo', 'bar');
-        expect(bag.get('foo')).toEqual('bar');
-
-        bag?.reset()
-=======
         expect(bag?.get('foo')).toBeUndefined();
         bag?.set('foo', 'bar');
         expect(bag?.get('foo')).toEqual('bar');
->>>>>>> Stashed changes
+        bag?.reset()
+
     })
 
     it('ensure two bad managers always have the same bag', () => {
