@@ -24,10 +24,10 @@ jobs:
           node-version: ${{matrix.node-version}}
 
       - name: Install yarn
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Build
         run: yarn build
 
       - name: Test
-        run: yarn test
+        run: yarn coverage
