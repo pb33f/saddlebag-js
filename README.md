@@ -3,7 +3,7 @@
 A tiny library for creating and managing stores and
 state in any JavaScript Application running anywhere.
 
-It is less than 1kb when gzipped and 3kb when minified.
+The build reports the current minified and gzipped bundle sizes.
 
 It's called '_saddlebag_' because every cowboy needs a reliable and simple place to store their stuff.
 
@@ -205,3 +205,62 @@ export const BAG_DB_NAME = 'saddlebag';
 ```
 
 `saddlebag` A product of [pb33f](https://pb33f.io).
+
+## Lazy persistent Bags
+
+`OpenPersistentBag` stores individual structured-cloneable values in IndexedDB.
+Opening a Bag does not restore its contents into memory, and reading an entry
+does not write anything. The existing synchronous `CreateBag` and Bag manager
+APIs remain unchanged; their stateful snapshots are separate from this API.
+
+```ts
+import { OpenPersistentBag } from '@pb33f/saddlebag';
+
+const avatars = await OpenPersistentBag<Blob>('avatars', {
+    maxEntries: 4096,
+    maxBytes: 256 * 1024 * 1024,
+    databaseName: 'my-app-avatar-cache',
+});
+
+const key = '/avatars/person/image-checksum';
+let image = await avatars.get(key);
+if (!image) {
+    image = await (await fetch(key)).blob();
+    await avatars.set(key, image, image.size);
+}
+// Create/revoke object URLs in the UI; store the Blob, never an object URL.
+await avatars.delete(key);
+await avatars.clear(); // Only this Bag, including its size accounting.
+avatars.close();
+```
+
+- `get` resolves with the requested value or `undefined` after a readonly
+  transaction. There is no eager loading, in-memory mirror, or TTL.
+- `set` takes an explicit non-negative safe-integer payload size. For Blobs use
+  `Blob.size`. Limits count these declared bytes, not IndexedDB's physical
+  storage overhead; callers must provide accurate sizes.
+- Writes evict the oldest-written entries until both byte and entry limits fit.
+  Updating an existing entry refreshes its order; reads leave the order intact.
+  This avoids disk writes for hot reads. An entry that cannot fit removes any
+  previous value at that key and resolves `false`, without evicting other keys.
+  Zero entry capacity disables retention; zero byte capacity permits empty values.
+- Each write updates payloads, small eviction metadata and counters in one
+  transaction. Concurrent tabs/handles cannot lose accounting updates. Use the
+  same limits for handles sharing a Bag: each write applies that handle's limits,
+  and opening with lower limits alone does not evict existing data.
+- `set`, `delete` and `clear` resolve only after commit. Errors, including quota,
+  clone, blocked-open and unavailable-storage errors, reject the operation.
+  Applications decide how to fall back when persistence is unavailable.
+- Bag IDs isolate entries within the database. The default database name is
+  `saddlebag-persistent`; custom names must be dedicated to this API. This API
+  does not migrate or read legacy stateful Bags.
+- `close` releases the connection. Started transactions finish, later operations
+  reject, and database upgrades close the handle automatically.
+- `clear` runs after earlier writes. Before clearing on logout, stop producers
+  from initiating further writes and await the clear; a later `set` can otherwise
+  populate the Bag again. Authentication, key scoping, logout coordination and
+  object-URL lifetime belong to the application.
+
+Values must be structured-cloneable; Promises and functions are not supported.
+The browser may evict IndexedDB data, so a persistent Bag should be treated as a
+cache when its values can be fetched again.
