@@ -264,3 +264,10 @@ avatars.close();
 Values must be structured-cloneable; Promises and functions are not supported.
 The browser may evict IndexedDB data, so a persistent Bag should be treated as a
 cache when its values can be fetched again.
+
+## Releasing
+
+Before merging a release PR into `main`, apply exactly one of `release/patch`,
+`release/minor`, or `release/major`. The tag workflow uses the merged PR label
+to bump the latest semantic-version tag and dispatch npm publication. Without
+a release label, the workflow skips tagging and publication.
