@@ -2,6 +2,10 @@
   "name": "@pb33f/saddlebag",
   "version": "0.1.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pb33f/saddlebag-js.git"
+  },
   "private": false,
   "description": "A tiny, pure JavaScript in-memory object store library for simple application state management",
   "type": "module",
